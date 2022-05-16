@@ -1,6 +1,7 @@
 import 'dart:io' as io;
 
 import 'package:camera/camera.dart';
+// import 'package:firebase_ml_model_downloader/firebase_ml_model_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_object_detection/google_mlkit_object_detection.dart';
@@ -57,7 +58,35 @@ class _ObjectDetectorView extends State<ObjectDetectorView> {
 
     // uncomment next lines if you want to use a local model
     // make sure to add tflite model to assets/ml
+
+    // FirebaseModelDownloader.instance
+    //     .getModel(
+    //         'tuna_model',
+    //         FirebaseModelDownloadType.localModelUpdateInBackground,
+    //         FirebaseModelDownloadConditions(
+    //           iosAllowsCellularAccess: true,
+    //           iosAllowsBackgroundDownloading: false,
+    //           androidChargingRequired: false,
+    //           androidWifiRequired: false,
+    //           androidDeviceIdleRequired: false,
+    //         ))
+    //     .then(
+    //   (customModel) {
+    //     print('model dowloadded');
+    //     // Download complete. Depending on your app, you could enable the ML
+    //     // feature, or switch from the local model to the remote model, etc.
+
+    //     // The CustomModel object contains the local path of the model file,
+    //     // which you can use to instantiate a TensorFlow Lite interpreter.
+    //     final localModelPath = customModel.file;
+    //     print(localModelPath);
+
+    //     // ...
+    //   },
+    // );
+
     final path = 'assets/ml/object_labeler.tflite';
+    // final path = 'assets/ml/model.tflite';
     final modelPath = await _getModel(path);
     final options = LocalObjectDetectorOptions(
       modelPath: modelPath,
@@ -90,18 +119,13 @@ class _ObjectDetectorView extends State<ObjectDetectorView> {
       _text = '';
     });
     final objects = await _objectDetector.processImage(inputImage);
-    if (inputImage.inputImageData?.size != null &&
-        inputImage.inputImageData?.imageRotation != null) {
-      final painter = ObjectDetectorPainter(
-          objects,
-          inputImage.inputImageData!.imageRotation,
-          inputImage.inputImageData!.size);
+    if (inputImage.inputImageData?.size != null && inputImage.inputImageData?.imageRotation != null) {
+      final painter = ObjectDetectorPainter(objects, inputImage.inputImageData!.imageRotation, inputImage.inputImageData!.size);
       _customPaint = CustomPaint(painter: painter);
     } else {
       String text = 'Objects found: ${objects.length}\n\n';
       for (final object in objects) {
-        text +=
-            'Object:  trackingId: ${object.trackingId} - ${object.labels.map((e) => e.text)}\n\n';
+        text += 'Object:  trackingId: ${object.trackingId} - ${object.labels.map((e) => e.text)}\n\n';
       }
       _text = text;
       // TODO: set _customPaint to draw boundingRect on top of image
@@ -122,8 +146,7 @@ class _ObjectDetectorView extends State<ObjectDetectorView> {
     final file = io.File(path);
     if (!await file.exists()) {
       final byteData = await rootBundle.load(assetPath);
-      await file.writeAsBytes(byteData.buffer
-          .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+      await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
     }
     return file.path;
   }
