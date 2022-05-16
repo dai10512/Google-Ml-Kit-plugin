@@ -1,3 +1,6 @@
+sampleをもとにMLkitの運用をテスト中
+
+
 # Google's ML Kit for Flutter
 
 Google's ML Kit for Flutter is a set of [Flutter plugins](https://flutter.io/platform-plugins/) that enable [Flutter](https://flutter.dev) apps to use [Google's standalone ML Kit](https://developers.google.com/ml-kit).
